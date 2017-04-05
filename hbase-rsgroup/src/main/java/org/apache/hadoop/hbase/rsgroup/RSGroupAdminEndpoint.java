@@ -77,7 +77,6 @@ import org.apache.hadoop.hbase.protobuf.generated.RSGroupAdminProtos.RemoveRSGro
 import org.apache.hadoop.hbase.protobuf.generated.RSGroupAdminProtos.RemoveRSGroupResponse;
 import org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription;
 
-
 public class RSGroupAdminEndpoint extends RSGroupAdminService
     implements CoprocessorService, Coprocessor, MasterObserver {
 
@@ -274,12 +273,36 @@ public class RSGroupAdminEndpoint extends RSGroupAdminService
     done.run(builder.build());
   }
 
+  void assignTableToGroup(HTableDescriptor desc) throws IOException {
+    String groupName =
+        master.getNamespaceDescriptor(desc.getTableName().getNamespaceAsString())
+                .getConfigurationValue(RSGroupInfo.NAMESPACEDESC_PROP_GROUP);
+    if (groupName == null) {
+      groupName = RSGroupInfo.DEFAULT_GROUP;
+    }
+    RSGroupInfo rsGroupInfo = groupAdminServer.getRSGroupInfo(groupName);
+    if (rsGroupInfo == null) {
+      throw new ConstraintException("Default RSGroup (" + groupName + ") for this table's "
+          + "namespace does not exist.");
+    }
+    if (!rsGroupInfo.containsTable(desc.getTableName())) {
+      groupAdminServer.moveTables(Sets.newHashSet(desc.getTableName()), groupName);
+    }
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // MasterObserver overrides
+  /////////////////////////////////////////////////////////////////////////////
+
+  // Assign table to default RSGroup.
   @Override
   public void preCreateTable(ObserverContext<MasterCoprocessorEnvironment> ctx,
       HTableDescriptor desc, HRegionInfo[] regions) throws IOException {
     groupAdminServer.prepareRSGroupForTable(desc);
+    assignTableToGroup(desc);
   }
 
+  // Remove table from its RSGroup.
   @Override
   public void postDeleteTable(ObserverContext<MasterCoprocessorEnvironment> ctx,
                               TableName tableName) throws IOException {
@@ -663,7 +686,7 @@ public class RSGroupAdminEndpoint extends RSGroupAdminService
   public void preCloneSnapshot(ObserverContext<MasterCoprocessorEnvironment> ctx,
                                SnapshotDescription snapshot,
                                HTableDescriptor hTableDescriptor) throws IOException {
-
+    assignTableToGroup(hTableDescriptor);
   }
 
   @Override
@@ -950,6 +973,5 @@ public class RSGroupAdminEndpoint extends RSGroupAdminService
                                  String groupName, boolean balancerRan) throws IOException {
 
   }
-
 
 }
