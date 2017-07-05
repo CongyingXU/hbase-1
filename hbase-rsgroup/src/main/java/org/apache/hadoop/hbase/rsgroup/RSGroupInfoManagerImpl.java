@@ -77,6 +77,7 @@ import org.apache.hadoop.hbase.protobuf.generated.ClientProtos;
 import org.apache.hadoop.hbase.protobuf.generated.MultiRowMutationProtos;
 import org.apache.hadoop.hbase.protobuf.generated.RSGroupProtos;
 import org.apache.hadoop.hbase.protobuf.generated.ZooKeeperProtos;
+import org.apache.hadoop.hbase.protobuf.generated.MultiRowMutationProtos.MutateRowsRequest;
 import org.apache.hadoop.hbase.regionserver.DisabledRegionSplitPolicy;
 import org.apache.hadoop.hbase.security.access.AccessControlLists;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -112,7 +113,6 @@ public class RSGroupInfoManagerImpl implements RSGroupInfoManager, ServerListene
   private volatile Map<String, RSGroupInfo> rsGroupMap;
   private volatile Map<TableName, String> tableMap;
   private MasterServices master;
-  private Table rsGroupTable;
   private ClusterConnection conn;
   private ZooKeeperWatcher watcher;
   private RSGroupStartupWorker rsGroupStartupWorker;
@@ -281,10 +281,9 @@ public class RSGroupInfoManagerImpl implements RSGroupInfoManager, ServerListene
     // if online read from GROUP table
     if (forceOnline || isOnline()) {
       LOG.debug("Refreshing in Online mode.");
-      if (rsGroupTable == null) {
-        rsGroupTable = conn.getTable(RSGROUP_TABLE_NAME);
+      try (Table rsGroupTable = conn.getTable(RSGROUP_TABLE_NAME)) {
+        groupList.addAll(rsGroupSerDe.retrieveGroupList(rsGroupTable));
       }
-      groupList.addAll(rsGroupSerDe.retrieveGroupList(rsGroupTable));
     } else {
       LOG.debug("Refershing in Offline mode.");
       String groupBasePath = ZKUtil.joinZNode(watcher.baseZNode, rsGroupZNode);
@@ -724,28 +723,32 @@ public class RSGroupInfoManagerImpl implements RSGroupInfoManager, ServerListene
 
   private void multiMutate(List<Mutation> mutations)
       throws IOException {
-    CoprocessorRpcChannel channel = rsGroupTable.coprocessorService(ROW_KEY);
-    MultiRowMutationProtos.MutateRowsRequest.Builder mmrBuilder
-      = MultiRowMutationProtos.MutateRowsRequest.newBuilder();
+    MutateRowsRequest.Builder mrmBuilder = MutateRowsRequest.newBuilder();
     for (Mutation mutation : mutations) {
       if (mutation instanceof Put) {
-        mmrBuilder.addMutationRequest(ProtobufUtil.toMutation(
+        mrmBuilder.addMutationRequest(ProtobufUtil.toMutation(
           ClientProtos.MutationProto.MutationType.PUT, mutation));
       } else if (mutation instanceof Delete) {
-        mmrBuilder.addMutationRequest(ProtobufUtil.toMutation(
+        mrmBuilder.addMutationRequest(ProtobufUtil.toMutation(
           ClientProtos.MutationProto.MutationType.DELETE, mutation));
       } else {
         throw new DoNotRetryIOException("multiMutate doesn't support "
           + mutation.getClass().getName());
       }
     }
-
-    MultiRowMutationProtos.MultiRowMutationService.BlockingInterface service =
-      MultiRowMutationProtos.MultiRowMutationService.newBlockingStub(channel);
-    try {
-      service.mutateRows(null, mmrBuilder.build());
-    } catch (ServiceException ex) {
-      ProtobufUtil.toIOException(ex);
+    MutateRowsRequest mrm = mrmBuilder.build();
+    // Be robust against movement of the rsgroup table
+    // TODO: Why is this necessary sometimes? Should we be using our own connection?
+    conn.clearRegionCache(RSGROUP_TABLE_NAME);
+    try (Table rsGroupTable = conn.getTable(RSGROUP_TABLE_NAME)) {
+      CoprocessorRpcChannel channel = rsGroupTable.coprocessorService(ROW_KEY);
+      MultiRowMutationProtos.MultiRowMutationService.BlockingInterface service =
+          MultiRowMutationProtos.MultiRowMutationService.newBlockingStub(channel);
+      try {
+        service.mutateRows(null, mrm);
+      } catch (ServiceException ex) {
+        ProtobufUtil.toIOException(ex);
+      }
     }
   }
 
