@@ -36539,7 +36539,7 @@ public final class MasterProtos {
 
       public final boolean isInitialized() {
         if (!hasCleanerChoreRan()) {
-
+          
           return false;
         }
         return true;
@@ -36981,7 +36981,7 @@ public final class MasterProtos {
 
       public final boolean isInitialized() {
         if (!hasOn()) {
-
+          
           return false;
         }
         return true;
@@ -38195,7 +38195,7 @@ public final class MasterProtos {
 
       public final boolean isInitialized() {
         if (!hasValue()) {
-
+          
           return false;
         }
         return true;
@@ -38801,7 +38801,7 @@ public final class MasterProtos {
        * <code>required .hbase.pb.SnapshotDescription snapshot = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription.Builder, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescriptionOrBuilder>
+          org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription.Builder, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescriptionOrBuilder> 
           getSnapshotFieldBuilder() {
         if (snapshotBuilder_ == null) {
           snapshotBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -39612,7 +39612,7 @@ public final class MasterProtos {
     /**
      * <code>repeated .hbase.pb.SnapshotDescription snapshots = 1;</code>
      */
-    java.util.List<org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription>
+    java.util.List<org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription> 
         getSnapshotsList();
     /**
      * <code>repeated .hbase.pb.SnapshotDescription snapshots = 1;</code>
@@ -39625,7 +39625,7 @@ public final class MasterProtos {
     /**
      * <code>repeated .hbase.pb.SnapshotDescription snapshots = 1;</code>
      */
-    java.util.List<? extends org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescriptionOrBuilder>
+    java.util.List<? extends org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescriptionOrBuilder> 
         getSnapshotsOrBuilderList();
     /**
      * <code>repeated .hbase.pb.SnapshotDescription snapshots = 1;</code>
@@ -39746,7 +39746,7 @@ public final class MasterProtos {
     /**
      * <code>repeated .hbase.pb.SnapshotDescription snapshots = 1;</code>
      */
-    public java.util.List<? extends org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescriptionOrBuilder>
+    public java.util.List<? extends org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescriptionOrBuilder> 
         getSnapshotsOrBuilderList() {
       return snapshots_;
     }
@@ -40270,7 +40270,7 @@ public final class MasterProtos {
       /**
        * <code>repeated .hbase.pb.SnapshotDescription snapshots = 1;</code>
        */
-      public java.util.List<? extends org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescriptionOrBuilder>
+      public java.util.List<? extends org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescriptionOrBuilder> 
            getSnapshotsOrBuilderList() {
         if (snapshotsBuilder_ != null) {
           return snapshotsBuilder_.getMessageOrBuilderList();
@@ -40296,12 +40296,12 @@ public final class MasterProtos {
       /**
        * <code>repeated .hbase.pb.SnapshotDescription snapshots = 1;</code>
        */
-      public java.util.List<org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription.Builder>
+      public java.util.List<org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription.Builder> 
            getSnapshotsBuilderList() {
         return getSnapshotsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription.Builder, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescriptionOrBuilder>
+          org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription.Builder, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescriptionOrBuilder> 
           getSnapshotsFieldBuilder() {
         if (snapshotsBuilder_ == null) {
           snapshotsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -40863,7 +40863,7 @@ public final class MasterProtos {
        * <code>required .hbase.pb.SnapshotDescription snapshot = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription.Builder, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescriptionOrBuilder>
+          org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription.Builder, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescriptionOrBuilder> 
           getSnapshotFieldBuilder() {
         if (snapshotBuilder_ == null) {
           snapshotBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -41819,7 +41819,7 @@ public final class MasterProtos {
        * <code>required .hbase.pb.SnapshotDescription snapshot = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription.Builder, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescriptionOrBuilder>
+          org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription.Builder, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescriptionOrBuilder> 
           getSnapshotFieldBuilder() {
         if (snapshotBuilder_ == null) {
           snapshotBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -42757,7 +42757,7 @@ public final class MasterProtos {
        * <code>optional .hbase.pb.SnapshotDescription snapshot = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription.Builder, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescriptionOrBuilder>
+          org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription.Builder, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescriptionOrBuilder> 
           getSnapshotFieldBuilder() {
         if (snapshotBuilder_ == null) {
           snapshotBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -43404,7 +43404,7 @@ public final class MasterProtos {
        * <code>optional .hbase.pb.SnapshotDescription snapshot = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription.Builder, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescriptionOrBuilder>
+          org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription.Builder, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescriptionOrBuilder> 
           getSnapshotFieldBuilder() {
         if (snapshotBuilder_ == null) {
           snapshotBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -43961,7 +43961,7 @@ public final class MasterProtos {
        * <code>optional .hbase.pb.SnapshotDescription snapshot = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription.Builder, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescriptionOrBuilder>
+          org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescription.Builder, org.apache.hadoop.hbase.protobuf.generated.SnapshotProtos.SnapshotDescriptionOrBuilder> 
           getSnapshotFieldBuilder() {
         if (snapshotBuilder_ == null) {
           snapshotBuilder_ = new com.google.protobuf.SingleFieldBuilder<
