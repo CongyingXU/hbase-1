@@ -68,6 +68,8 @@ import org.apache.hadoop.hbase.protobuf.generated.RSGroupAdminProtos.GetRSGroupI
 import org.apache.hadoop.hbase.protobuf.generated.RSGroupAdminProtos.GetRSGroupInfoResponse;
 import org.apache.hadoop.hbase.protobuf.generated.RSGroupAdminProtos.ListRSGroupInfosRequest;
 import org.apache.hadoop.hbase.protobuf.generated.RSGroupAdminProtos.ListRSGroupInfosResponse;
+import org.apache.hadoop.hbase.protobuf.generated.RSGroupAdminProtos.MoveServersAndTablesRequest;
+import org.apache.hadoop.hbase.protobuf.generated.RSGroupAdminProtos.MoveServersAndTablesResponse;
 import org.apache.hadoop.hbase.protobuf.generated.RSGroupAdminProtos.MoveServersRequest;
 import org.apache.hadoop.hbase.protobuf.generated.RSGroupAdminProtos.MoveServersResponse;
 import org.apache.hadoop.hbase.protobuf.generated.RSGroupAdminProtos.MoveTablesRequest;
@@ -203,6 +205,26 @@ public class RSGroupAdminEndpoint extends RSGroupAdminService
       ResponseConverter.setControllerException(controller, e);
     }
     done.run(response);
+  }
+
+  @Override
+  public void moveServersAndTables(RpcController controller, MoveServersAndTablesRequest request,
+      RpcCallback<MoveServersAndTablesResponse> done) {
+    MoveServersAndTablesResponse.Builder builder = MoveServersAndTablesResponse.newBuilder();
+    try {
+      Set<HostAndPort> hostPorts = Sets.newHashSet();
+      for (HBaseProtos.ServerName el : request.getServersList()) {
+        hostPorts.add(HostAndPort.fromParts(el.getHostName(), el.getPort()));
+      }
+      Set<TableName> tables = new HashSet<>(request.getTableNameList().size());
+      for (HBaseProtos.TableName tableName : request.getTableNameList()) {
+        tables.add(ProtobufUtil.toTableName(tableName));
+      }
+      groupAdminServer.moveServersAndTables(hostPorts, tables, request.getTargetGroup());
+    } catch (IOException e) {
+      ResponseConverter.setControllerException(controller, e);
+    }
+    done.run(builder.build());
   }
 
   @Override
@@ -950,6 +972,16 @@ public class RSGroupAdminEndpoint extends RSGroupAdminService
   public void postMoveTables(ObserverContext<MasterCoprocessorEnvironment> ctx,
                              Set<TableName> tables, String targetGroup) throws IOException {
 
+  }
+
+  @Override
+  public void preMoveServersAndTables(ObserverContext<MasterCoprocessorEnvironment> ctx,
+      Set<HostAndPort> servers, Set<TableName> tables, String targetGroup) throws IOException {
+  }
+
+  @Override
+  public void postMoveServersAndTables(ObserverContext<MasterCoprocessorEnvironment> ctx,
+      Set<HostAndPort> servers, Set<TableName> tables, String targetGroup) throws IOException {
   }
 
   @Override

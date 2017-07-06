@@ -144,6 +144,13 @@ public class VerifyingRSGroupAdminClient extends RSGroupAdmin {
   }
 
   @Override
+  public void moveServersAndTables(Set<HostAndPort> servers, Set<TableName> tables,
+      String targetGroup) throws IOException {
+    wrapped.moveServersAndTables(servers, tables, targetGroup);
+    verify();
+  }
+
+  @Override
   public void close() throws IOException {
   }
 }

@@ -118,4 +118,15 @@ public abstract class RSGroupAdmin implements Closeable {
    * @throws java.io.IOException on unexpected failure to retrieve GroupInfo
    */
   public abstract RSGroupInfo getRSGroupOfServer(HostAndPort hostPort) throws IOException;
+
+
+  /**
+   * Move given set of servers and tables to the specified target RegionServer group.
+   * @param servers set of servers to move
+   * @param tables set of tables to move
+   * @param targetGroup the target group name
+   * @throws IOException
+   */
+  public abstract void moveServersAndTables(Set<HostAndPort> servers, Set<TableName> tables,
+      String targetGroup) throws IOException;
 }

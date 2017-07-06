@@ -2691,6 +2691,12 @@ public class AccessController extends BaseMasterAndRegionObserver
   }
 
   @Override
+  public void preMoveServersAndTables(ObserverContext<MasterCoprocessorEnvironment> ctx,
+      Set<HostAndPort> servers, Set<TableName> tables, String targetGroup) throws IOException {
+    requirePermission("moveServersAndTables", Action.ADMIN);
+  }
+
+  @Override
   public void preMoveServers(ObserverContext<MasterCoprocessorEnvironment> ctx,
                              Set<HostAndPort> servers, String targetGroup) throws IOException {
     requirePermission("moveServers", Action.ADMIN);

@@ -39,6 +39,7 @@ import org.apache.hadoop.hbase.protobuf.generated.HBaseProtos;
 import org.apache.hadoop.hbase.protobuf.generated.RSGroupAdminProtos;
 import org.apache.hadoop.hbase.protobuf.generated.RSGroupAdminProtos.GetRSGroupInfoOfServerResponse;
 import org.apache.hadoop.hbase.protobuf.generated.RSGroupAdminProtos.GetRSGroupInfoOfTableResponse;
+import org.apache.hadoop.hbase.protobuf.generated.RSGroupAdminProtos.MoveServersAndTablesRequest;
 import org.apache.hadoop.hbase.protobuf.generated.RSGroupProtos;
 
 
@@ -193,6 +194,27 @@ class RSGroupAdminClient extends RSGroupAdmin {
         return ProtobufUtil.toGroupInfo(resp.getRSGroupInfo());
       }
       return null;
+    } catch (ServiceException e) {
+      throw ProtobufUtil.getRemoteException(e);
+    }
+  }
+
+  @Override
+  public void moveServersAndTables(Set<HostAndPort> servers, Set<TableName> tables,
+      String targetGroup) throws IOException {
+    MoveServersAndTablesRequest.Builder builder =
+        MoveServersAndTablesRequest.newBuilder().setTargetGroup(targetGroup);
+    for(HostAndPort el: servers) {
+      builder.addServers(HBaseProtos.ServerName.newBuilder()
+        .setHostName(el.getHostText())
+        .setPort(el.getPort())
+        .build());
+    }
+    for(TableName tableName: tables) {
+      builder.addTableName(ProtobufUtil.toProtoTableName(tableName));
+    }
+    try {
+      proxy.moveServersAndTables(null, builder.build());
     } catch (ServiceException e) {
       throw ProtobufUtil.getRemoteException(e);
     }

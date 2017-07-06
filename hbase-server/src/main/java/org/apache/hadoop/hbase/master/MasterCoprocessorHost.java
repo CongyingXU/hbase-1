@@ -1231,6 +1231,32 @@ public class MasterCoprocessorHost
     });
   }
 
+  public void preMoveServersAndTables(final Set<HostAndPort> servers, final Set<TableName> tables,
+      final String targetGroup) throws IOException {
+    execOperation(coprocessors.isEmpty() ? null : new CoprocessorOperation() {
+      @Override
+      public void call(MasterObserver oserver,
+                       ObserverContext<MasterCoprocessorEnvironment> ctx) throws IOException {
+        if(((MasterEnvironment)ctx.getEnvironment()).supportGroupCPs) {
+          oserver.preMoveServersAndTables(ctx, servers, tables, targetGroup);
+        }
+      }
+    });
+  }
+
+  public void postMoveServersAndTables(final Set<HostAndPort> servers, final Set<TableName> tables,
+      final String targetGroup) throws IOException {
+    execOperation(coprocessors.isEmpty() ? null : new CoprocessorOperation() {
+      @Override
+      public void call(MasterObserver oserver,
+                       ObserverContext<MasterCoprocessorEnvironment> ctx) throws IOException {
+        if(((MasterEnvironment)ctx.getEnvironment()).supportGroupCPs) {
+          oserver.postMoveServersAndTables(ctx, servers, tables, targetGroup);
+        }
+      }
+    });
+  }
+
   public void preAddRSGroup(final String name)
       throws IOException {
     execOperation(coprocessors.isEmpty() ? null : new CoprocessorOperation() {

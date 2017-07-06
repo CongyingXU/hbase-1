@@ -701,4 +701,115 @@ public abstract class TestRSGroupsBase {
     assertTrue(newGroupTables.contains(tableNameA));
     assertTrue(newGroupTables.contains(tableNameB));
   }
+
+  @Test
+  public void testMoveServersAndTables() throws Exception {
+    final TableName tableName = TableName.valueOf(tablePrefix + "_testMoveServersAndTables");
+    final RSGroupInfo newGroup = addGroup(rsGroupAdmin, getGroupName("testMoveServersAndTables"), 1);
+
+    //create table
+    final byte[] familyNameBytes = Bytes.toBytes("f");
+    TEST_UTIL.createMultiRegionTable(tableName, familyNameBytes, 5);
+    TEST_UTIL.waitFor(WAIT_TIMEOUT, new Waiter.Predicate<Exception>() {
+      @Override
+      public boolean evaluate() throws Exception {
+        List<String> regions = getTableRegionMap().get(tableName);
+        if (regions == null)
+          return false;
+        return getTableRegionMap().get(tableName).size() >= 5;
+      }
+    });
+
+    //get server which is not a member of new group
+    ServerName targetServer = null;
+    for(ServerName server : admin.getClusterStatus().getServers()) {
+      if(!newGroup.containsServer(server.getHostPort()) && 
+           !rsGroupAdmin.getRSGroupInfo("master").containsServer(server.getHostPort())) {
+        targetServer = server;
+        break;
+      }
+    }
+
+    LOG.debug("Print group info : " + rsGroupAdmin.listRSGroups());
+    int oldDefaultGroupServerSize =
+            rsGroupAdmin.getRSGroupInfo(RSGroupInfo.DEFAULT_GROUP).getServers().size();
+    int oldDefaultGroupTableSize =
+            rsGroupAdmin.getRSGroupInfo(RSGroupInfo.DEFAULT_GROUP).getTables().size();
+
+    //test fail bogus server move
+    try {
+      rsGroupAdmin.moveServersAndTables(Sets.newHashSet(HostAndPort.fromString("foo:9999")),
+              Sets.newHashSet(tableName), newGroup.getName());
+      fail("Bogus servers shouldn't have been successfully moved.");
+    } catch(IOException ex) {
+    }
+
+    //test fail server move
+    try {
+      rsGroupAdmin.moveServersAndTables(Sets.newHashSet(targetServer.getHostPort()),
+              Sets.newHashSet(tableName), RSGroupInfo.DEFAULT_GROUP);
+      fail("servers shouldn't have been successfully moved.");
+    } catch(IOException ex) {
+    }
+
+    //verify default group info
+    Assert.assertEquals(oldDefaultGroupServerSize,
+            rsGroupAdmin.getRSGroupInfo(RSGroupInfo.DEFAULT_GROUP).getServers().size());
+    Assert.assertEquals(oldDefaultGroupTableSize,
+            rsGroupAdmin.getRSGroupInfo(RSGroupInfo.DEFAULT_GROUP).getTables().size());
+
+    //verify new group info
+    Assert.assertEquals(1,
+            rsGroupAdmin.getRSGroupInfo(newGroup.getName()).getServers().size());
+    Assert.assertEquals(0,
+            rsGroupAdmin.getRSGroupInfo(newGroup.getName()).getTables().size());
+
+    //get all region to move targetServer
+    List<String> regionList = getTableRegionMap().get(tableName);
+    for(String region : regionList) {
+      // Lets move this region to the targetServer
+      admin.move(Bytes.toBytes(HRegionInfo.encodeRegionName(Bytes.toBytes(region))),
+              Bytes.toBytes(targetServer.getServerName()));
+    }
+
+    TEST_UTIL.waitFor(WAIT_TIMEOUT, new Waiter.Predicate<Exception>() {
+      @Override
+      public boolean evaluate() throws Exception {
+        return getTableRegionMap().get(tableName) != null &&
+                getTableRegionMap().get(tableName).size() == 5 &&
+                getTableServerRegionMap().get(tableName).size() == 1 &&
+                admin.getClusterStatus().getRegionsInTransition().size() < 1;
+      }
+    });
+
+    //verify that all region move to targetServer
+    Assert.assertNotNull(getTableServerRegionMap().get(tableName));
+    Assert.assertNotNull(getTableServerRegionMap().get(tableName).get(targetServer));
+    Assert.assertEquals(5, getTableServerRegionMap().get(tableName).get(targetServer).size());
+
+    //move targetServer and table to newGroup
+    LOG.info("moving server and table to newGroup");
+    rsGroupAdmin.moveServersAndTables(Sets.newHashSet(targetServer.getHostPort()),
+            Sets.newHashSet(tableName), newGroup.getName());
+
+    //verify group change
+    Assert.assertEquals(newGroup.getName(),
+            rsGroupAdmin.getRSGroupInfoOfTable(tableName).getName());
+
+    //verify servers' not exist in old group
+    Set<HostAndPort> defaultServers = rsGroupAdmin.getRSGroupInfo(RSGroupInfo.DEFAULT_GROUP).getServers();
+    assertFalse(defaultServers.contains(targetServer.getHostPort()));
+
+    //verify servers' exist in new group
+    Set<HostAndPort> newGroupServers = rsGroupAdmin.getRSGroupInfo(newGroup.getName()).getServers();
+    assertTrue(newGroupServers.contains(targetServer.getHostPort()));
+
+    //verify tables' not exist in old group
+    Set<TableName> defaultTables = rsGroupAdmin.getRSGroupInfo(RSGroupInfo.DEFAULT_GROUP).getTables();
+    assertFalse(defaultTables.contains(tableName));
+
+    //verify tables' exist in new group
+    Set<TableName> newGroupTables = rsGroupAdmin.getRSGroupInfo(newGroup.getName()).getTables();
+    assertTrue(newGroupTables.contains(tableName));
+  }
 }

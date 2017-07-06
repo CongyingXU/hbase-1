@@ -501,6 +501,19 @@ public class RSGroupAdminServer extends RSGroupAdmin {
   }
 
   @Override
+  public void moveServersAndTables(Set<HostAndPort> servers, Set<TableName> tables,
+      String targetGroup) throws IOException {
+    if (servers == null || servers.isEmpty() ) {
+      throw new ConstraintException("The list of servers to move cannot be null or empty.");
+    }
+    if (tables == null || tables.isEmpty()) {
+      throw new ConstraintException("The list of tables to move cannot be null or empty.");
+    }
+    moveServers(servers, targetGroup);
+    moveTables(tables, targetGroup);
+  }
+
+  @Override
   public void close() throws IOException {
   }
 }

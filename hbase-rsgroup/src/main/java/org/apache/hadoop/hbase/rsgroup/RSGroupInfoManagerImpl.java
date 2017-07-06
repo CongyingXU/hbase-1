@@ -780,4 +780,28 @@ public class RSGroupInfoManagerImpl implements RSGroupInfoManager, ServerListene
     }
   }
 
+  @Override
+  public void moveServersAndTables(Set<HostAndPort> servers, Set<TableName> tables, String srcGroup,
+      String dstGroup) throws IOException {
+    //get server's group
+    RSGroupInfo srcGroupInfo = getRSGroup(srcGroup);
+    RSGroupInfo dstGroupInfo = getRSGroup(dstGroup);
+
+    //move servers
+    for (HostAndPort el: servers) {
+      srcGroupInfo.removeServer(el);
+      dstGroupInfo.addServer(el);
+    }
+    //move tables
+    for(TableName tableName: tables) {
+      srcGroupInfo.removeTable(tableName);
+      dstGroupInfo.addTable(tableName);
+    }
+
+    //flush changed groupinfo
+    Map<String,RSGroupInfo> newGroupMap = Maps.newHashMap(rsGroupMap);
+    newGroupMap.put(srcGroupInfo.getName(), srcGroupInfo);
+    newGroupMap.put(dstGroupInfo.getName(), dstGroupInfo);
+    flushConfig(newGroupMap);    
+  }
 }

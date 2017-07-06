@@ -605,6 +605,16 @@ public class BaseMasterObserver implements MasterObserver {
   }
 
   @Override
+  public void preMoveServersAndTables(ObserverContext<MasterCoprocessorEnvironment> ctx,
+      Set<HostAndPort> servers, Set<TableName> tables, String targetGroup) throws IOException {
+  }
+
+  @Override
+  public void postMoveServersAndTables(ObserverContext<MasterCoprocessorEnvironment> ctx,
+      Set<HostAndPort> servers, Set<TableName> tables, String targetGroup) throws IOException {
+  }
+
+  @Override
   public void preAddRSGroup(ObserverContext<MasterCoprocessorEnvironment> ctx, String name)
       throws IOException {
   }
