@@ -33,12 +33,11 @@ EOF
       end
 
       def command(group_name)
-        now = Time.now
-        formatter.header(['RSGROUP '.concat(group_name)])
+        formatter.header(['GROUP INFORMATION'])
         rsgroup_admin.get_rsgroup(group_name) do |s|
           formatter.row([s])
         end
-        formatter.footer(now)
+        formatter.footer()
       end
     end
   end
