@@ -20,16 +20,19 @@
 
 package org.apache.hadoop.hbase.rsgroup;
 
-import com.google.common.collect.Sets;
-import com.google.common.net.HostAndPort;
-
 import java.util.Collection;
 import java.util.NavigableSet;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.classification.InterfaceAudience;
 import org.apache.hadoop.hbase.classification.InterfaceStability;
+import org.apache.hadoop.hbase.util.Addressing;
+
+import com.google.common.collect.Sets;
+import com.google.common.net.HostAndPort;
 
 /**
  * Stores the group information of region server groups.
@@ -53,14 +56,13 @@ public class RSGroupInfo {
               Set<HostAndPort> servers,
               NavigableSet<TableName> tables) {
     this.name = name;
-    this.servers = servers;
-    this.tables = tables;
+    this.servers = new TreeSet<>(new Addressing.HostAndPortComparable());
+    this.servers.addAll(servers);
+    this.tables = new TreeSet<>(tables);
   }
 
   public RSGroupInfo(RSGroupInfo src) {
-    name = src.getName();
-    servers = Sets.newHashSet(src.getServers());
-    tables = Sets.newTreeSet(src.getTables());
+    this(src.getName(), src.servers, src.tables);
   }
 
   /**
@@ -183,5 +185,4 @@ public class RSGroupInfo {
     result = 31 * result + name.hashCode();
     return result;
   }
-
 }

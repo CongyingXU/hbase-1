@@ -23,17 +23,18 @@ module Shell
     class GetRsgroup < Command
       def help
         return <<-EOF
-Get a region server group's information.
+Get a RegionServer group's information.
 
 Example:
 
   hbase> get_rsgroup 'default'
+
 EOF
       end
 
       def command(group_name)
         now = Time.now
-        formatter.header(['GROUP INFORMATION'])
+        formatter.header(['RSGROUP '.concat(group_name)])
         rsgroup_admin.get_rsgroup(group_name) do |s|
           formatter.row([s])
         end

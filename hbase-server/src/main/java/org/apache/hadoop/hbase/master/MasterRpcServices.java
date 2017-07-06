@@ -696,7 +696,8 @@ public class MasterRpcServices extends RSRpcServices
       String methodName = call.getMethodName();
       if (!master.coprocessorServiceHandlers.containsKey(serviceName)) {
         throw new UnknownProtocolException(null,
-          "No registered master coprocessor service found for name "+serviceName);
+          "No registered Master Coprocessor Endpoint found for " + serviceName +
+          ". Has it been enabled?");
       }
 
       Service service = master.coprocessorServiceHandlers.get(serviceName);
